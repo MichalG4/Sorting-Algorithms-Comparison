@@ -1,5 +1,12 @@
 #include <iostream>
-
+#include <cmath>
+void swap(int array[],unsigned int i, unsigned int j)
+{
+    int temp=array[i];
+    array[i]=array[j];
+    array[j]=temp;
+    return;
+}
 //merge sort
 void merge(int left_array[], int right_array[], int array[],unsigned int size)
 {
@@ -54,16 +61,8 @@ void merge_sort(int array[],unsigned int size)
     delete [] left_array;
     delete [] right_array;
 }
-
 // quick sort
-void swap(int array[],unsigned int i, unsigned int j)
-{
-    int temp=array[i];
-    array[i]=array[j];
-    array[j]=temp;
-    return;
-}
-unsigned int partition(int array[],unsigned int start, unsigned int end)
+unsigned int partition(int array[],unsigned int start, unsigned int end) //Lomuto, later Hoare could be implemented
 {
     int pivot=array[end];
     int j=(int)start,i=(int)start-1;
@@ -88,13 +87,76 @@ void quick_sort_main(int array[],unsigned int start, unsigned int end)
         quick_sort_main(array,start,pivot_index-1);
     quick_sort_main(array,pivot_index+1,end);
 }
-void quick_sort(int array[], unsigned int size)//built both quick_sort and quick_sort_main for consistency of number of arguments in X_sort functions
+void quick_sort(int array[], unsigned int size)//built both quick_sort and quick_sort_main for consistency of number of arguments in X_sort functions || could later improve pivot selection
 {
     if(size==0) return;
     quick_sort_main(array,0,size-1);
 }
+//heap sort
+void heapify(int array[],unsigned int start, unsigned int end,unsigned int index)
+{
+    unsigned int left = ((2*index)+1)-start;
+    unsigned int right= left+1;
+    unsigned int max=index;//index of max node, default to starting index
+    if(right<=end && array[right]>array[index])
+    {
+        max=right;
+    }
+    if(left<=end && array[left]>array[max])
+    {
+        max=left;
+    }
+    if(max!=index)
+    {
+        swap(array,index,max);
+        heapify(array,start,end,max);
+    }
+    return;
+}
+void create_max_heap(int array[],unsigned int start, unsigned int end)
+{
+    for(int i=(end-start/*size-1*/)/2;i>=0;i--)
+    {
+        heapify(array,start,end,i+start);
+    }
+    return;
+}
+void heap_sort_main(int array[],unsigned int start, unsigned int end) //built both heap_sort and heap_sort_main for consistency of number of arguments in X_sort functions 
+{
+    if(end-start+1<=1) return;
+    create_max_heap(array,start,end);
+    for(;end>start;end--)
+    {
+        swap(array,start,end);
+        heapify(array,start,end-1,start);
+    }
+    return;
+}
+void heap_sort(int array[],unsigned int size)//heap sort using array indexed from 0
+{
+    if(size<=1) return;
+    heap_sort_main(array,0,size-1);
+}
 //introspective sort
-
+void intro_sort_main(int array[],unsigned int start, unsigned int end,unsigned int max_depth)
+{
+    if(start>=end) return;
+    //if(n<16) insertion_sort(array,size); //could add in the future
+    if(max_depth==0) heap_sort_main(array,start,end);
+    else 
+    {
+        unsigned int pivot_index = partition(array,start,end);
+        if (pivot_index > start)//in case of pivot_index == 0 
+            intro_sort_main(array,start,pivot_index-1,max_depth-1);
+        intro_sort_main(array,pivot_index+1,end,max_depth-1);
+    }
+}
+void introspective_sort(int array[],unsigned int size)
+{
+    if(size<=1) return;
+    unsigned int max_depth=2*static_cast<unsigned int>(floor(log2(static_cast<double>(size))));
+    intro_sort_main(array,0,size-1,max_depth);
+}
 //bucket sort
 
 
@@ -104,7 +166,9 @@ int main()
     int array[10]={8,5,2,0,1,9,3,7,4,6};
 
     //merge_sort(array, sizeof(array)/sizeof(array[0]));
-    quick_sort(array, sizeof(array)/sizeof(array[0]));
+    //quick_sort(array, sizeof(array)/sizeof(array[0]));
+    //heap_sort(array, sizeof(array)/sizeof(array[0]));
+    introspective_sort(array, sizeof(array)/sizeof(array[0]));
     for(int i=0;i<10;i++)
     std::cout<<array[i]<<std::endl;
     return 0;
