@@ -1,0 +1,1 @@
+size is send to function as parameter to avoid disrupting time complexity with calling sizeof() function everytime and division
