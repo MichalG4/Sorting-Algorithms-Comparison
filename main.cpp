@@ -174,6 +174,67 @@ void introspective_sort(int array[],unsigned int size)
     intro_sort_main(array,0,size-1,max_depth);
 }
 //bucket sort
+void bucket_sort_recursive(int array[],unsigned int start, unsigned int end)
+{
+    if(end<=start) return;
+    if(end-start<15) //if size less than 15 sort using insertion_sort()
+    {
+        insertion_sort_main(array,start,end); 
+        return;
+    }
+    unsigned int size = end-start+1;
+    //find MAX, MIN
+    int MAX=array[start], MIN=array[start];
+    for(unsigned int i=start+1;i<=end;i++)
+    {
+        if(array[i]>MAX) MAX=array[i];
+        else if(array[i]<MIN) MIN=array[i]; 
+    }
+    if(MAX == MIN)
+    {
+        return;
+    }
+    //initialize needed lists, we avoid making int[][] list as it generates O(n^2) in terms of space
+    unsigned int *counts=new unsigned int[size]();  //how many items in each bucket
+    unsigned int *offsets=new unsigned int[size](); //offset of each bucket inside buffer[]
+    unsigned int *cursors=new unsigned int[size]; //needed for inserting buckets into buffer without modyfying offsets[]
+    int *buffer=new  int[size]; // buffer for storing buckets
+    //count elements in each bucket
+
+    //formula for calculating bucket index for each item, normalize to [0,1] then multiply:
+    //(unsigned int)floor((((double)(array[i]-MIN)/(MAX-MIN)))*(size-1))
+
+    for(unsigned int i=start;i<=end;i++)
+    {
+        counts[(unsigned int)floor((((double)(array[i]-MIN)/(MAX-MIN)))*(size-1))]++;
+    }
+    //calculate offsets,copy it into curosors
+    for(unsigned int i=1;i<size;i++)//indexed from 1 because offset [0] is always 0
+    {
+        offsets[i]=offsets[i-1]+counts[i-1];
+    }    
+    memcpy(cursors,offsets,size*sizeof(offsets[0]));
+    //insert into buckets inside buffer
+    for(int i=start;i<=end;i++)
+    {
+        unsigned int idx=(unsigned int)floor((((double)(array[i]-MIN)/(MAX-MIN)))*(size-1));
+        buffer[cursors[idx]]=array[i];
+        cursors[idx]++;
+    }
+    //Sort
+    for(int i=0;i<size;i++)
+    {
+        if(cursors[i]>offsets[i]+1)//if bucket not empty nor with single item
+        bucket_sort_recursive(buffer,offsets[i],cursors[i]-1);//sort each bucket indepenently   
+    }
+    //Copy to array[]
+    memcpy(array+start,buffer,size*sizeof(buffer[0]));
+    
+    delete[] counts;
+    delete[] offsets;
+    delete[] cursors;
+    delete[] buffer;
+}
 void bucket_sort_main(int array[],unsigned int start, unsigned int end)
 {
     if(end<=start) return;
@@ -184,6 +245,10 @@ void bucket_sort_main(int array[],unsigned int start, unsigned int end)
     {
         if(array[i]>MAX) MAX=array[i];
         else if(array[i]<MIN) MIN=array[i]; 
+    }
+    if(MAX == MIN)
+    {
+        return;
     }
     //initialize needed lists, we avoid making int[][] list as it generates O(n^2) in terms of space
     unsigned int *counts=new unsigned int[size]();  //how many items in each bucket
@@ -220,7 +285,7 @@ void bucket_sort_main(int array[],unsigned int start, unsigned int end)
     }
     //Copy to array[]
     memcpy(array+start,buffer,size*sizeof(buffer[0]));
-    
+
     delete[] counts;
     delete[] offsets;
     delete[] cursors;
