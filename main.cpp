@@ -132,13 +132,34 @@ void heap_sort(int array[],unsigned int size)//heap sort using array indexed fro
     if(size<=1) return;
     heap_sort_main(array,0,size-1);
 }
+//insertion sort
+void insertion_sort_main(int array[],unsigned int start,unsigned int end)
+{
+    if(end<=start) return;
+    for(int i=start+1;i<=end;i++)
+    {
+        int temp=array[i];
+        unsigned int j=i;
+            while(j>start && array[j-1]>temp)
+            {
+                array[j]=array[j-1];
+                j--;
+            }
+            array[j]=temp;
+    }
+}
+void insertion_sort(int array[],unsigned int size)
+{
+    if(size<=1) return;
+    insertion_sort_main(array,0,size-1);
+}
 //introspective sort
 void intro_sort_main(int array[],unsigned int start, unsigned int end,unsigned int max_depth)
 {
     if(start>=end) return;
-    //if(n<16) insertion_sort(array,size); //could add in the future
+    if((end-start+1)<16) insertion_sort_main(array,start,end); 
     if(max_depth==0) heap_sort_main(array,start,end);
-    else 
+    else    //quick sort
     {
         unsigned int pivot_index = partition(array,start,end);
         if (pivot_index > start)//in case of pivot_index == 0 
@@ -160,10 +181,11 @@ int main()
 {
     int array[10]={8,5,2,0,1,9,3,7,4,6};
 
-    merge_sort(array, sizeof(array)/sizeof(array[0]));
+    //merge_sort(array, sizeof(array)/sizeof(array[0]));
     //quick_sort(array, sizeof(array)/sizeof(array[0]));
     //heap_sort(array, sizeof(array)/sizeof(array[0]));
-    //introspective_sort(array, sizeof(array)/sizeof(array[0]));
+    introspective_sort(array, sizeof(array)/sizeof(array[0]));
+    //insertion_sort(array,sizeof(array)/sizeof(array[0]));
     for(int i=0;i<10;i++)
     std::cout<<array[i]<<std::endl;
     return 0;
