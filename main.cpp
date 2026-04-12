@@ -8,7 +8,7 @@ void swap(int array[],unsigned int i, unsigned int j)
     return;
 }
 //merge sort
-void merge(int left_array[], int right_array[], int array[],unsigned int size)
+/*void merge(int left_array[], int right_array[], int array[],unsigned int size)
 {
     unsigned int leftsize=size/2;
     unsigned int rightsize=size-leftsize;
@@ -41,10 +41,51 @@ void merge(int left_array[], int right_array[], int array[],unsigned int size)
             r++;
     }
     return;
+}*/
+void merge(int array[],int buffer[],unsigned int start_left,unsigned int end_left,unsigned int start_right,unsigned int end_right)
+{
+    memcpy(buffer+start_left,array+start_left,(end_right-start_left+1)*sizeof(array[start_left])); //copy to buffer integers from array that interest us
+    int i=start_left,l=start_left,r=start_right;//current indexes of array,right_array,left_array;
+    while(l<=end_left && r<=end_right)//merge while left and right are present
+    {
+        if(buffer[l]<buffer[r])//merge if smaller
+        {
+            array[i]=buffer[l];
+            i++;
+            l++;
+        }
+        else
+        {
+            array[i]=buffer[r];
+            i++;
+            r++;
+        }
+    }
+        while(l<=end_left)//merge all that are left
+    {
+            array[i]=buffer[l];
+            i++;
+            l++;
+    }
+    while(r<=end_right)//merge all that are left
+    {
+            array[i]=buffer[r];
+            i++;
+            r++;
+    }
+    return;
+}
+void merge_sort_impl(int array[],int buffer[], unsigned int start, unsigned int end)
+{
+    if(end-start+1<=1) return;
+    unsigned int half=((start+end-1)/2);
+    merge_sort_impl(array,buffer,start,half);
+    merge_sort_impl(array,buffer,half+1,end);
+    merge(array,buffer,start,half,half+1,end);
 }
 void merge_sort(int array[],unsigned int size)
 {
-    if(size<=1) return;
+    /*if(size<=1) return;
     unsigned int newsize=size/2;
     int* left_array=new int[newsize];
     int* right_array=new int[size-newsize];
@@ -59,7 +100,12 @@ void merge_sort(int array[],unsigned int size)
     merge_sort(right_array,size-newsize);
     merge(left_array,right_array,array,size);
     delete [] left_array;
-    delete [] right_array;
+    delete [] right_array;*/
+
+    if(size<=1) return;
+    int* buffer = new int[size];
+    merge_sort_impl(array,buffer,0,size-1);
+    delete [] buffer;
 }
 // quick sort
 unsigned int partition(int array[],unsigned int start, unsigned int end) //Lomuto, later Hoare could be implemented
@@ -165,10 +211,10 @@ int main()
 {
     int array[10]={8,5,2,0,1,9,3,7,4,6};
 
-    //merge_sort(array, sizeof(array)/sizeof(array[0]));
+    merge_sort(array, sizeof(array)/sizeof(array[0]));
     //quick_sort(array, sizeof(array)/sizeof(array[0]));
     //heap_sort(array, sizeof(array)/sizeof(array[0]));
-    introspective_sort(array, sizeof(array)/sizeof(array[0]));
+    //introspective_sort(array, sizeof(array)/sizeof(array[0]));
     for(int i=0;i<10;i++)
     std::cout<<array[i]<<std::endl;
     return 0;
