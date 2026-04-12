@@ -8,40 +8,6 @@ void swap(int array[],unsigned int i, unsigned int j)
     return;
 }
 //merge sort
-/*void merge(int left_array[], int right_array[], int array[],unsigned int size)
-{
-    unsigned int leftsize=size/2;
-    unsigned int rightsize=size-leftsize;
-    int i=0,r=0,l=0;//current indexes of array,right_array,left_array;
-    while(l<leftsize && r<rightsize)//merge while left and right are present
-    {
-        if(left_array[l]<right_array[r])//merge if smaller
-        {
-            array[i]=left_array[l];
-            l++;
-            i++;
-        }
-        else
-        {
-            array[i]=right_array[r];
-            r++;
-            i++;
-        }
-    }
-    while(l<leftsize)//merge all that are left
-    {
-            array[i]=left_array[l];
-            i++;
-            l++;
-    }
-    while(r<rightsize)//merge all that are left
-    {
-            array[i]=right_array[r];
-            i++;
-            r++;
-    }
-    return;
-}*/
 void merge(int array[],int buffer[],unsigned int start_left,unsigned int end_left,unsigned int start_right,unsigned int end_right)
 {
     memcpy(buffer+start_left,array+start_left,(end_right-start_left+1)*sizeof(array[start_left])); //copy to buffer integers from array that interest us
@@ -85,23 +51,6 @@ void merge_sort_impl(int array[],int buffer[], unsigned int start, unsigned int 
 }
 void merge_sort(int array[],unsigned int size)
 {
-    /*if(size<=1) return;
-    unsigned int newsize=size/2;
-    int* left_array=new int[newsize];
-    int* right_array=new int[size-newsize];
-
-    for(int i=0;i<size;i++) //split array in half
-    {
-        if(i<newsize) left_array[i]=array[i];
-        else right_array[i-newsize]=array[i];
-    }
-
-    merge_sort(left_array,newsize);
-    merge_sort(right_array,size-newsize);
-    merge(left_array,right_array,array,size);
-    delete [] left_array;
-    delete [] right_array;*/
-
     if(size<=1) return;
     int* buffer = new int[size];
     merge_sort_impl(array,buffer,0,size-1);
@@ -169,7 +118,7 @@ void create_max_heap(int array[],unsigned int start, unsigned int end)
 }
 void heap_sort_main(int array[],unsigned int start, unsigned int end) //built both heap_sort and heap_sort_main for consistency of number of arguments in X_sort functions 
 {
-    if(end-start+1<=1) return;
+    if(end<=start) return;
     create_max_heap(array,start,end);
     for(;end>start;end--)
     {
