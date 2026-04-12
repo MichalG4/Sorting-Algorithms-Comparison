@@ -1,5 +1,6 @@
 #include <iostream>
-#include <cmath>
+#include <cmath>    //for log2()
+#include <cstring> // for memcpy()
 void swap(int array[],unsigned int i, unsigned int j)
 {
     int temp=array[i];
@@ -157,8 +158,8 @@ void insertion_sort(int array[],unsigned int size)
 void intro_sort_main(int array[],unsigned int start, unsigned int end,unsigned int max_depth)
 {
     if(start>=end) return;
-    if((end-start+1)<16) insertion_sort_main(array,start,end); 
-    if(max_depth==0) heap_sort_main(array,start,end);
+    if(end-start<15) {insertion_sort_main(array,start,end); return;}
+    if(max_depth==0) {heap_sort_main(array,start,end); return;}
     else    //quick sort
     {
         unsigned int pivot_index = partition(array,start,end);
