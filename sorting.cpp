@@ -1,6 +1,7 @@
 #include <iostream>
-#include <cmath>    //for log2()
+#include <cmath>    //for floor log2()
 #include <cstring> // for memcpy()
+#include "sorting.h"
 void swap(int array[],unsigned int i, unsigned int j)
 {
     int temp=array[i];
@@ -58,29 +59,36 @@ void merge_sort(int array[],unsigned int size)
     delete [] buffer;
 }
 // quick sort
-unsigned int partition(int array[],unsigned int start, unsigned int end) //Lomuto, later Hoare could be implemented
+unsigned int median_of_three(int array[], unsigned int start, unsigned int end) {
+    unsigned int mid = start + (end - start) / 2;
+    
+    if (array[start] > array[mid])
+        swap(array, start, mid);
+    if (array[start] > array[end])
+        swap(array, start, end);
+    if (array[mid] > array[end])
+        swap(array, mid, end);
+    swap(array, mid, end);
+    return array[end];
+}
+unsigned int partition(int array[],unsigned int start, unsigned int end) //Hoare
 {
-    int pivot=array[end];
-    int j=(int)start,i=(int)start-1;
-    while (j!=end)
-    {
-        if(array[j]<pivot)
-        {
-            i++;
-            swap(array,i,j);
-        }
-        j++;
+    int pivot=median_of_three(array,start,end);
+    int i = (int)start - 1;
+    int j = (int)end + 1;
+
+    while (true) {
+        do { i++; } while (array[i] < pivot);
+        do { j--; } while (array[j] > pivot);
+        if (i >= j) return (unsigned int)j;
+        swap(array, i, j);
     }
-    i++;
-    swap(array,i,j);
-    return (unsigned int)i;
 }
 void quick_sort_main(int array[],unsigned int start, unsigned int end)
 {
     if(start>=end) return;
     unsigned int pivot_index = partition(array,start,end);
-    if (pivot_index > start)//in case of pivot_index == 0 
-        quick_sort_main(array,start,pivot_index-1);
+    quick_sort_main(array,start,pivot_index);
     quick_sort_main(array,pivot_index+1,end);
 }
 void quick_sort(int array[], unsigned int size)//built both quick_sort and quick_sort_main for consistency of number of arguments in X_sort functions || could later improve pivot selection
@@ -163,8 +171,7 @@ void intro_sort_main(int array[],unsigned int start, unsigned int end,unsigned i
     else    //quick sort
     {
         unsigned int pivot_index = partition(array,start,end);
-        if (pivot_index > start)//in case of pivot_index == 0 
-            intro_sort_main(array,start,pivot_index-1,max_depth-1);
+        intro_sort_main(array,start,pivot_index,max_depth-1);
         intro_sort_main(array,pivot_index+1,end,max_depth-1);
     }
 }
@@ -301,17 +308,17 @@ void bucket_sort(int array[],const unsigned int size)
 
 
 
-int main()
-{
-    int array[10]={8,5,2,0,1,9,3,7,4,6};
+// int main()
+// {
+//     int array[10]={8,5,2,0,1,9,3,7,4,6};
 
-    //merge_sort(array, sizeof(array)/sizeof(array[0]));
-    //quick_sort(array, sizeof(array)/sizeof(array[0]));
-    //heap_sort(array, sizeof(array)/sizeof(array[0]));
-    //introspective_sort(array, sizeof(array)/sizeof(array[0]));
-    //insertion_sort(array,sizeof(array)/sizeof(array[0]));
-    bucket_sort(array,sizeof(array)/sizeof(array[0]));
-    for(int i=0;i<10;i++)
-    std::cout<<array[i]<<std::endl;
-    return 0;
-}
+//     //merge_sort(array, sizeof(array)/sizeof(array[0]));
+//     //quick_sort(array, sizeof(array)/sizeof(array[0]));
+//     //heap_sort(array, sizeof(array)/sizeof(array[0]));
+//     //introspective_sort(array, sizeof(array)/sizeof(array[0]));
+//     //insertion_sort(array,sizeof(array)/sizeof(array[0]));
+//     bucket_sort(array,sizeof(array)/sizeof(array[0]));
+//     for(int i=0;i<10;i++)
+//     std::cout<<array[i]<<std::endl;
+//     return 0;
+// }
